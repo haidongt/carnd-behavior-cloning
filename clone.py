@@ -4,7 +4,10 @@ import numpy as np
 import os.path
 import random
 
-directories = ['./data7', './data8']
+#directories = ['./data7', './data8']
+
+directories = ['./data7', './data10', './data9']
+directories = ['./terrain1', './terrain2', './extra', './extra1']
 bucket_number = 10
 
 
@@ -48,33 +51,35 @@ def loadDirectory(directory, augmented_images, augmented_measurements):
 
         keep_prob = 1
         if abs(bucket) == 0:
-            keep_prob = 0
-        #if abs(bucket) == 1:
-        #   keep_prob = 0
-        #if abs(bucket) == 2:
-        #   keep_prob = 1
+            keep_prob = 1 #0.015
+        if abs(bucket) == 1:
+            keep_prob = 1 #0.3
+        if abs(bucket) == 2:
+            keep_prob = 1 #0.5
         if random.random() > keep_prob:
-           continue
+            continue
 
+        #if measurement == 0:
+        #    continue
         '''
-    for i in range(3):
-        source_path = line[i]
-        tokens = source_path.split('/')
-        filename = tokens[-1]
-        local_path = directory + '/IMG/' + filename
-        image = cv2.imread(local_path)
-        images.append(image)
+        for i in range(3):
+            source_path = line[i]
+            tokens = source_path.split('/')
+            filename = tokens[-1]
+            local_path = directory + '/IMG/' + filename
+            image = cv2.imread(local_path)
+            images.append(image)
    
-    correction = 0.1
-    measurements.append(measurement)
-    measurements.append(measurement + correction)
-    measurements.append(measurement - correction)
-    '''
+        correction = 0.2
+        measurements.append(measurement)
+        measurements.append(measurement + correction)
+        measurements.append(measurement - correction)
+        '''
         image = cv2.imread(local_path)
 
-        for i in range(1): #repeat[bucket]):
-            images.append(image)
-            measurements.append(measurement)
+        images.append(image)
+        measurements.append(measurement)
+        #'''
     
 
     for image, measurement in zip(images, measurements):
@@ -139,6 +144,8 @@ model.add(MaxPooling2D())
 model.add(Convolution2D(16,5,5,activation='relu'))
 model.add(MaxPooling2D())
 model.add(Flatten())
+#model.add(Dropout(0.5))
+#model.add(Dense(240))
 model.add(Dropout(0.5))
 model.add(Dense(120))
 model.add(Dropout(0.5))
@@ -146,7 +153,7 @@ model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=3)
 
 model.save('model.h5')
 
