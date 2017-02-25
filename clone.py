@@ -7,7 +7,8 @@ import random
 #directories = ['./data7', './data8']
 
 directories = ['./data7', './data10', './data9']
-directories = ['./terrain1', './terrain2', './extra', './extra1']
+directories = ['./terrain1', './terrain2', './extra', './extra1', 'extra2']
+#directories = ['./extra1']
 bucket_number = 10
 
 
@@ -113,13 +114,16 @@ for directory in directories:
 # exit()
 
 
-X_train = np.array(images)
-y_train = np.array(measurements)
+#X = np.array(images)
+#Y = np.array(measurements)
+from sklearn.utils import shuffle
+
 
 import keras
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout
 from keras.layers.convolutional import Convolution2D
+from keras.preprocessing.image import ImageDataGenerator
 
 from keras.layers.pooling import MaxPooling2D
 model = Sequential()
@@ -150,11 +154,30 @@ model.add(Dropout(0.5))
 model.add(Dense(120))
 model.add(Dropout(0.5))
 model.add(Dense(84))
+model.add(Dropout(0.5))
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=3)
+# model.fit(X, Y, validation_split=0.2, shuffle=True, nb_epoch=3)
 
+def myGenerator(images, measurements):
+    indexes = np.arange(len(images))
+    order = np.arange(len(images))
+    random.shuffle(order)
+    idx = 0
+    while 1:
+       X = []
+       Y = []
+       for i in range(32):
+           if idx == len(images):
+               idx = 0
+           X.append(images[order[idx]])
+           Y.append(measurements[order[idx]])
+           idx = idx + 1
+       yield(np.array(X), np.array(Y))
+
+model.fit_generator(myGenerator(images, measurements),
+    samples_per_epoch=len(images), nb_epoch=3)
 model.save('model.h5')
 
 
