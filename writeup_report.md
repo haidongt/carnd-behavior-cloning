@@ -1,10 +1,10 @@
 # Network Structure
-
+The first layer is a 5 by 5 convolutional layer, followed by a max pooling layer. The next layer is also a 5 by 5 convolutional layer followed by a max pooling layer. After that, the output is flattened. The flattened output is then going though a dropout layer followed by a 84 node dense layer, and then a dropout layer followed by a 84 node dense layer, and then a dropout layer followed by a one node dense layer.
 
 # Data Collection
-My strategy for data collection is to drive continuously for several laps. I intentionally make some mistakes and then I control the vehicle to recover to the center of the lane. I have a pattern when I make mistakes so that I can easily remove the sample images where I'm making mistakes in my pre-processing step. When I make mistakes I just let go of the mouse and let the car drift to the side, so that the steering angle in this process is always zero, and I'll remove sample images with zero steering angle.
+I first drive continuously for several laps to get my dataset a baseline of all situations. I then intentionally make some minor mistakes, i.e. driving car to side of road and then drive back to center. I only record the part where I'm driving towards center. I now use the trained model to do autonomous mode to see how well my model is performing and identify any weak locations. I then focus on these weak locations and drive in these weak locations to add more samples to enhance my model's weakness.
 
-# Data Pre-processing
-I have plotted a histogram of the steering angle distribution and I found that most steering angles are about zero. 
+# To prevent overfitting
+I used several different strategies to prevent overfitting. The first is that I collected a lot of data. Before data preprocessing, my data set contains roughly 30,000 samples. I use a 0.2 validation split to train the model. I also use two dropout layers to prevent overfitting.
 
 
